@@ -8,10 +8,11 @@ p <- function(val)
   cant <- 0
   while(val>0)
   {
-    cant<-cant+1
-    d<- val%%2
-    val<-val/2
-    val <- floor(val)
+    cant <-cant+1
+    d    <- val%%2
+    val  <-val/2
+    val  <- floor(val)
+    
     if(val > 1)
     {
       print("-----------")
@@ -25,6 +26,10 @@ p <- function(val)
 }
 
 p(73)
+
+T<- function(n){floor(log2(n)+1)}
+
+print(T(73))
 
 
 # algo asi como T(n/2) -> O(log n) si no estoy mal 
