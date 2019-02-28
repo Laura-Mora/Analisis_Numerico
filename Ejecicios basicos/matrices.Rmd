@@ -1,0 +1,204 @@
+
+#Construccion
+```{r}
+ # --- Matriz nula 3x3
+ A = matrix(rep(0,9), nrow = 3, ncol= 3); A
+#     [,1] [,2] [,3]
+#[1,]    0    0    0
+#[2,]    0    0    0
+#[3,] 0 0 0
+# --- Declarar una matriz por filas (el default es "por columnas") B = matrix(c(1,2,3,5,6,7), nrow = 2, byrow=T); B
+#     [,1] [,2] [,3]
+#[1,]    1    2    3
+#[2,]    5    6    7
+# --- Declarar primero las columnas "x", "y" y "z"
+x = 1:3; y = seq(1,2, by = 0.5); z = rep(8, 3) ; x; y; z #[1] 1 2 3
+#[1] 1.0 1.5 2.0
+#[1] 8 8 8
+# --- Combinar "x", "y" y "z" para formar una matriz
+C = matrix(c(x,y,z), nrow = length(x)); C # ncol no es necesario declararlo
+#     [,1] [,2] [,3]
+#[1,]    1  1.0    8
+#[2,]    2  1.5    8
+#[3,]    3  2.0    8
+# --- Construir la matriz por filas (rbind) o por columnas (cbind)
+ xi = seq(1,2, by 0.1); yi = seq(5,10, by = 0.5)
+ rbind(xi,yi)
+# [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11] #xi 1 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2 #yi 5 5.5 6.0 6.5 7.0 7.5 8.0 8.5 9.0 9.5 10
+cbind(xi,yi)
+# xiyi # [1,] 1.0 5.0 # [2,] 1.1 5.5
+# [3,] 1.2  6.0
+# [4,] 1.3  6.5
+# [5,] 1.4  7.0
+# [6,] 1.5  7.5
+# [7,] 1.6  8.0
+# [8,] 1.7  8.5
+# [9,] 1.8  9.0
+#[10,] 1.9  9.5
+#[11,] 2.0 10.0
+```
+```{bash}
+#Diagonal
+# --- construir una matriz diagonal
+ I = diag(c(3,1,3)); I
+#     [,1] [,2] [,3]
+#[1,]    3    0    0
+#[2,]    0    1    0
+#[3,]    0    0    3
+ # --- Extraer la diagonal de la matriz I
+diag(I)
+print(I);
+#[1] 3 1 3
+# --- Matriz diagonal nxn
+n=3
+I = diag(1, n);
+# [,1] [,2] [,3]
+#[1,] 1 0 0
+#[2,] 0 1 0
+#[3,] 0 0 1
+# --- Matriz diagonal, con la diagonal de A D = diag(diag(A))
+# --- Matriz nxm, con 1’s en las entradas a_{ii}: diag(1, n, m) J = diag(1, 3, 4); J
+```
+#Multi
+```{bash}
+x = 4:6; y = 1:3
+outer(x,y) # Fun = "*" por defecto % [,1] [,2] [,3]
+#[1,] 4 8 12
+#[2,] 510 15
+#[3,] 612 18
+ outer(x,y, FUN = "+")
+#[,1] [,2] [,3] %[1,] 5 6 7 %[2,] 6 7 8 %[3,] 7 8 9
+```
+
+#Operaciones
+```{bash}
+A = matrix(c( 1, 1 ,8,
+              2, 0, 8,
+              3, 2, 8), nrow = 3, byrow=TRUE); A
+#     [,1] [,2] [,3]
+#[1,]    1    1    8
+#[2,]    2    0    8
+#[3,]    3    2    8
+A[c(1,3), ] = A[c(3,1), ]
+#     [,1] [,2] [,3]
+#[1,]    3    2    8
+#[2,]    2    0    8
+#[3,]    1    1    8
+# Cambio F1, F3
+A[2, ] = A[2, ] - A[2,1]/A[1,1]*A[1, ] # F2 - a_{21}/a_{11}*F1 # [,1] [,2] [,3]
+#[1,]    3  2.000000 8.000000
+#[2,]    0 -1.333333 2.666667
+#[3,]    1  1.000000 8.000000
+```
+#Matriz triangular inferior
+```{bash}
+A = matrix(c( 1, 1 ,8, 5,
+             2, 0, 8, 9,
+             3, 2, 8, 3,
+             2, 6, 5, 1), nrow = 4, byrow=TRUE)
+ 
+LA = A
+2, 6, 5, 1), nrow = 4, byrow=TRUE)
+ LA[col(LA) >= row(LA)+1] = 0; LA
+#      [,1] [,2] [,3] [,4]
+#[1,]    1    0    0    0
+#[2,]    2    0    0    0
+#[3,]    3    2    8    0
+#[4,]    2    6    5    1
+LA = A
+LA[col(LA) >= row(LA)] = 0; LA
+#      [,1] [,2] [,3] [,4]
+#[1,]    0    0    0    0
+#[2,]    2    0    0    0
+#[3,]    3    2    0    0
+#[4,]    2    6    5    0
+```
+
+
+#REQUIERE PAQUETE MATRIX!!!!
+```{bash}
+mm = matrix(rep(1, 9), nrow=3, byrow=T); mm # [,1] [,2] [,3]
+#[1,] 1 1 1
+#[2,] 1 1 1
+#[3,] 1 1 1
+tril(mm) # lower triangle
+# 3 x 3 Matrix of class "dtrMatrix" # [,1] [,2] [,3]
+
+ 
+#[1,] 1 . .
+#[2,] 1 1 .
+#[3,] 1 1 1
+triu(mm) # upper triangle
+# 3 x 3 Matrix of class "dtrMatrix" # [,1] [,2] [,3]
+#[1,] 1 1 1
+#[2,] . 1 1
+#[3,] . . 1
+tril(mm, -1) # strict lower triangle # 3 x 3 Matrix of class "dtrMatrix"
+# [,1] [,2] [,3]
+#[1,] 0
+#[2,] 1
+#[3,] 1
+tril(mm, 1)
+# 3 x 3 Matrix of class "dgeMatrix" # [,1] [,2] [,3]
+
+# strict lower triangle
+#[1,] 1 1 0
+#[2,] 1 1 1
+#[3,] 1 1 1
+triu(mm, 1) # strict upper triangle # 3 x 3 Matrix of class "dtrMatrix"
+# [,1] [,2] [,3]
+#[1,] 0 1 1
+#[2,] . 0 1
+#[3,] . . 0
+triu(mm, -1) # strict upper triangle # 3 x 3 Matrix of class "dgeMatrix"
+# [,1] [,2] [,3]
+#[1,] 1 1 1
+#[2,] 1 1 1
+#[3,] 0 1 1
+```
+#OPERACIONES BASICAS
+```{bash}
+B = matrix(rep(1,9), nrow=3); B
+#     [,1] [,2] [,3]
+#[1,]    1    4    7
+#[2,]    2    5    8
+#[3,]    3    6    9
+#     [,1] [,2] [,3]
+#[1,]    1    1    1
+#[2,]    1    1    1
+#[3,]    1    1    1
+# --- Suma
+A+B
+
+ # --- Producto miembro a miembro
+ A*B
+
+ # --- multiplicación matricial
+A%*% B
+
+A^2 #No es A*A
+
+A %* %A
+
+ # --- Restar 2 a cada A[i,j]
+A-2
+
+
+# --- Producto escalar
+ 3*A
+
+ # --- Transpuesta
+t(A)
+
+ # --- Determinante
+det(A)
+# [1] 0
+# --- Inversas
+C = A - diag(1,3)
+det(C)
+# [1] 32
+# Inversa de C existe
+solve(C)
+
+```
+
