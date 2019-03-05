@@ -1,0 +1,206 @@
+3. 
+a. Pruebe el siguiente algoritmo con una matriz $A_{3}$, modifiquelo para quue $a_{ii}=0$ para todo $i$
+```{r, echo=T}
+mat = matrix(
+  c(
+    2.6,0.3,2.4,
+    7.7,0.4,4.7,
+    5.1,9.9,9.5,
+    6.0,7.0,8.5
+  ), nrow= 3 , byrow = TRUE
+)
+tril1 <- function(M, k = 0) {
+  #mat[upper.tri(mat, diag = TRUE)] <- 0   
+  #mat[lower.tri(mat, diag = FALSE)] <- 0
+  if (k == 0) 
+  {
+    M[upper.tri(M, diag = FALSE)] <- 0
+  } 
+  else 
+  {
+    M[col(M) >= row(M) + k + 1] <- 0
+  }
+  return(M)
+}
+
+tril1(mat,0)
+```
+b. Implemente una función en R para que dada una matriz $A$ se obtenga una matriz diagonal $D$ donde en la diagonal estan los mismo elementos de A
+
+```{r}
+diag <- function(mat)
+{
+  mat[upper.tri(mat, diag = FALSE)] <- 0
+  mat[lower.tri(mat, diag = FALSE)] <- 0
+  print(mat)
+}
+mat = matrix(
+  c(
+    2.6,0.3,2.4,
+    7.7,0.4,4.7,
+    5.1,9.9,9.5,
+    6.0,7.0,8.5
+  ), nrow= 3 , byrow = TRUE
+)
+diag(mat)
+
+```
+
+
+4. Cree una función que cuente el número de multiplicaciones en el método directo de Gauss Jordan, para resolver un sistema de $n$ ecuaciones y pruebelo para $n=5$
+
+```{r}
+gauss = function(A, b)
+{  
+  n = nrow(A) 
+  Ab = cbind(A,b)
+  mult <- 0
+  for (k in 1:(n-1))
+  {   
+    if(Ab[k,k]==0)
+    {
+      fila = which(Ab[k, ]!=0)[1]
+      Ab[c(k, fila),  ] = Ab[c(fila, k),  ]
+      mult <- mult +1
+    }
+    for (i in (k+1):n)
+    {
+      Ab[i, ] = Ab[i, ] - Ab[i, k]/Ab[k,k]*Ab[k, ]
+      mult <- mult +1
+    } 
+  }
+  x = rep(NA, times=n)
+  x[n] = Ab[n, n+1]/Ab[n,n] 
+  for(i in(n-1):1)
+  {
+    x[i]= (Ab[i, n+1]-sum(Ab[i,(i+1):n]*x[(i+1):n]))/Ab[i,i]
+    mult <- mult +1
+  }
+  
+  cat("multiplicaciones : ",mult,"\n")
+  
+  return(x) 
+}
+
+A = matrix(c( 0,  2,  3, 3,
+              -5, -4,  1, 4,
+              0,  0,  0, 3,
+              -4, -7, -8, 9), nrow=4, byrow=TRUE)
+b = c(1,0,0,0)
+gauss(A,b)
+
+```
+
+
+5. Dado el siguiente sistema:
+
+    $2x-z=1$                                                                                
+    $\beta$x+2y-z=2                                                                         
+    $-x+y+$\alpha$z=1$
+
+a. Encuentre el valor de $\alpha$ y $\beta$ para asegura la convergencia por el método de Jacobi
+```{r}
+
+rm(list=ls())
+
+alpha <- 5
+beta  <- 4
+
+B = matrix(c(   2   ,0,-1   ,                                                                                
+                beta,2,-1   ,                                                                         
+                -1  ,1,alpha), nrow=3, byrow= TRUE)
+
+
+b <- c(1,2,1)
+solve(B,b)
+
+
+```
+
+b. Genere una tabla que tenga 10 iteraciones del método de Jacobi con vector inicial $x_{0}=[1,2,3]^t$
+
+```{r}
+rm(list=ls())
+alpha <- 5
+beta  <- 3
+B = matrix(c(   2   ,0,-1   ,                                                                                
+                beta,2,-1   ,                                                                         
+                -1  ,1,alpha), nrow=3, byrow= TRUE)
+
+
+b <- c(1,2,3)
+resp <- solve(B,b)
+for( i in c(1:9))
+{
+  resp <- solve(B,resp)
+  print(resp)
+}
+
+```
+
+
+c. Grafique cada ecuación y la solución
+
+```{r}
+rm(list=ls())
+jacobi<-function(a,ciclos) 
+{
+  n<-nrow(a)
+  id <- matrix(0, n, n)
+  diag(id) <- 1
+  Q<-id
+  for (k in 1:ciclos) {
+    for ( i in 1:(n-1)) {
+      for ( j in (i+1):n) {
+        control <- 10^(-k)
+        if( abs(a[i,j]) > control) 
+        {
+          #print(c(a[i,j],control))
+          angulo <- 0.5*atan(2*a[i,j]/(a[i,i] - a[j,j]))
+          c<-cos(angulo)
+          s<-sin(angulo)
+          p<-id
+          p[i,i]<-c
+          p[j,j]<-c
+          p[i,j]<- s
+          p[j,i]<- s
+          Q <- Q%*%p
+          a<-t(p)%*%a%*%p
+          a[i,j]<-0
+          a[j,i]<-0
+        }
+      }
+    }
+    print(a)
+  }
+  
+  cat("\n")  
+  cat("\n")
+  cat("\n")
+  #return(list(raices=diag(a),vectores=Q,estado=a))
+}
+
+
+alpha <- 5
+beta  <- 3
+
+B = matrix(c(2,0,-1,1,beta,2,-1,2,-1,1,alpha,1,0,0,0,0), ncol=4, byrow= TRUE)
+print(B)
+jacobi(B,10)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
