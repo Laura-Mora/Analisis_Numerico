@@ -1,0 +1,363 @@
+---
+title: "Taller ecuciones diferenciales"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+Valores para a,b,c y w
+a=-4
+b=1/5
+c=10.45
+w=sqrt(3)-> raiz de 3
+
+Punto 1.
+Resolver el problema de valor inicial, utilizando el método de Runge-Kutta de orden tres y de orden cuatro, obtenga: a. 20 puntos de la solución con h = 0.1 y h = 0.2, 
+b. Encuentre los errores locales y el error global. 
+c. Realice una gráfica que compare la solución del aproximada con la exacta, para la ecuación:
+X''− aX − X'= 0; X(0) = 2, X'(0) = −1
+
+```{r}
+rm(list=ls())
+require(deSolve)
+require(PolynomF)
+require(Matrix)
+options(digits = 4)
+
+funcionReal<-function(x){
+  yR <- (2/15)*exp(x/2)*(15*cos((sqrt(15)*x)/2)-2*sqrt(15)*sin((sqrt(15)*x)/2))
+  return(yR)
+}
+
+funcion=function(t,y,parms){
+  dy <- y[2]
+  dz <- -4*y[1]+y[2]
+  return(list(c(dy,dz)))
+}
+tis = seq(0,2,by = 0.1)
+yR = funcionReal(tis)
+plot(tis,yR,pch = 15, col = "red", cex = 1, xlim = c(0, 2), ylim = c(-10, 5), xlab = "x", ylab = "y",main = "x''-x-x'=0 con h = 0,1")
+par(new = TRUE)
+
+sol = ode(c(2,-1),tis,funcion,parms=NULL,method = "rk4")
+tabla = data.frame(sol)
+
+plot(tis,tabla[,2], pch = 15, col = "blue", cex = 0.5,xlim = c(0, 2), ylim = c(-10, 5), xlab = "x", ylab = "y")
+
+legend("topright",
+       c("analytical","rk4, h=0.1"),
+       lty = c(NA, NA), lwd = c(2, 1),
+       pch = c(16, 16),
+       col = c("red", "blue"))
+error <- (yR-tabla[,2])/tabla[,2]
+tablaError = data.frame(tis, round(yR, digits = 5),round(tabla[,2], digits = 5),round(error, digits = 5))
+colnames(tablaError) <- c("x","y","y(RK4)","Error")
+tablaError
+errorGlobal <- sum(error)/length(error)
+errorGlobal
+
+#con h=0,2
+rm(list=ls())
+funcionReal<-function(x){
+  yR <- (2/15)*exp(x/2)*(15*cos((sqrt(15)*x)/2)-2*sqrt(15)*sin((sqrt(15)*x)/2))
+  return(yR)
+}
+
+funcion=function(t,y,parms){
+  dy <- y[2]
+  dz <- -4*y[1]+y[2]
+  return(list(c(dy,dz)))
+}
+tis = seq(0,4,by = 0.2)
+yR = funcionReal(tis)
+plot(tis,yR,pch = 15, col = "red", cex = 1, xlim = c(0, 4), ylim = c(-20, 5), xlab = "x", ylab = "y", main = "x''-x-x'=0 con h = 0,2")
+par(new = TRUE)
+sol = ode(c(2,-1),tis,funcion,parms=NULL,method = "rk4")
+tabla = data.frame(sol)
+plot(tis,tabla[,2], pch = 15, col = "blue", cex = 0.5,xlim = c(0, 4), ylim = c(-20, 5), xlab = "x", ylab = "y")
+legend("topright",
+       c("analytical","rk4, h=0.1"),
+       lty = c(NA, NA), lwd = c(2, 1),
+       pch = c(16, 16),
+       col = c("red", "blue"))
+
+error <- (yR-tabla[,2])/tabla[,2]
+tablaError = data.frame(tis, round(yR, digits = 5),round(tabla[,2], digits = 5),round(error, digits = 5))
+colnames(tablaError) <- c("x","y","y(RK4)","Error")
+tablaError
+errorGlobal <- sum(error)/length(error)
+errorGlobal
+exacta<- function (x) (2/15)*exp(x/2)*(15*cos((sqrt(15)*x)/2)-2*sqrt(15)*sin((sqrt(15)*x)/2))
+```
+
+Punto 2.
+Encuentre los 10 puntos de la solución del siguiente problema de valor inicial. 
+a. Utilice el método de Euler mejorado. 
+b.Grafique los errores locales y globales y comparelos y determine su orden de convergencia
+
+X Con la condición inicial x(0) = 3; y(0) = 6
+
+```{r}
+euler1 = function(f,f2,t0, y0, h, n) {
+#Datos igualmente espaciados iniciando en x0 = a, paso h. "n" datos 
+  t = seq(t0, t0 + (n-1)*h, by = h) # n datos
+y = rep(NA, times=n) # n datos
+y[1]=y0
+x = rep(NA, times=n) # n datos
+x[1]=t0
+for(i in 2:n ) x[i]= x[i-1]+h*f(t[i-1], x[i-1])
+for(i in 2:n ) y[i]= y[i-1]+h*f2(t[i-1], y[i-1])
+print(cbind(t,y)) # print
+plot(t,y, pch=19, col="red") # gráfica
+print (cbind(t,x))
+plot(y,x,pch=19, col="blue")
+}
+
+xprima = function(x,y) 3*x-0.2*y
+
+yprima <- function(x,y) 5*x-4*y
+
+n=10
+x0=3
+y0=6
+h=0.1
+
+
+euler1(xprima,yprima,x0, y0,h,n)
+```
+
+Punto 3.
+Solucionar la siguiente ecuación utilice el métdo de Runge-Kutta de cuarto orden con h = 0.1, grafique la solución, obtenga 20 puntos de la solución
+Y''− Y'− X + Y + 1 = 0; Y (0) = 1; Y'(0) = 2
+```{r}
+rm(list=ls())
+require(deSolve)
+require(PolynomF)
+require(Matrix)
+options(digits = 4)
+rm(list=ls())
+funcionReal<-function(x){
+  yR <- x + (exp(x/2)*sin((sqrt(3)*x)/2))/sqrt(3) + exp(x/2)*cos((sqrt(3)*x)/2) 
+  return(yR)
+}
+
+funcion=function(t,y,parms){
+  dy <- y[2]
+  dz <- y[2]+t-y[1]-1
+  return(list(c(dy,dz)))
+}
+tis = seq(0,2,by = 0.1)
+yR = funcionReal(tis)
+
+plot(tis,yR,pch = 15, col = "red", cex = 1, xlim = c(0, 3), ylim = c(0, 5), xlab = "x", ylab = "y", main = "y''- y'- x + y +1 =0 con h = 0,1")
+par(new = TRUE)
+sol = ode(c(1,2),tis,funcion,parms=NULL,method = "rk4")
+
+tabla = data.frame(sol)
+plot(tis,tabla[,2], pch = 15, col = "blue", cex = 0.5,xlim = c(0, 3), ylim = c(0, 5), xlab = "x", ylab = "y")
+legend("topright",
+       c("analytical","rk4, h=0.1"),
+       lty = c(NA, NA), lwd = c(2, 1),
+       pch = c(16, 16),
+       col = c("red", "blue"))
+
+error <- (yR-tabla[,2])/tabla[,2]
+tablaError = data.frame(tis, round(yR, digits = 5),round(tabla[,2], digits = 5),round(error, digits = 5))
+colnames(tablaError) <- c("x","y()","y(RK4)","Error")
+tablaError
+errorGlobal <- sum(error)/length(error)
+errorGlobal
+```
+Punto 4.
+Utilizando el método de Euler mejorado y el método de Taylor, solucionar el siguiente problema:
+Una masa de c libras de peso,está unida al extremo libre de un resorte ligero que es estirado 1 pie por una fuerza de 4 libras. La masa se encuentra inicialmente en reposo en su posición de equilibrio. Iniciando en el tiempo t = 0 (segundos), se le aplica una fuerza externa f(t) = cos2t a la masa, pero en el instante t = 2π la fuerza se interrumpe (abruptamente ) y la masa queda libre continuando con su movimiento. Encuéntrese la función x(t) de posición resultante para la masa, gráfique la función de movimiento, encuentre en el periodo, la frecuencia, y en que instantes pasa por su posición de equilibrio.
+
+```{r}
+euler1 = function(f, t0, y0, h, n) {
+#Datos igualmente espaciados iniciando en x0 = a, paso h. "n" datos 
+t = seq(t0, t0 + (n-1)*h, by = h) # n datos
+y = rep(NA, times=n) # n datos
+y[1]=y0
+for(i in 2:n ) y[i]= y[i-1]+h*f(t[i-1], y[i-1])
+print(cbind(t,y)) # print
+plot(t,y, pch=19, col="red") # gráfica
+}
+f = function(t,u) cos(2*t)-u*(t-2*pi)*cos(2*(t-2*pi))
+euler1(f, 4, 0, 0.1, 10)
+
+
+```
+
+```{r}
+#install.packages(Deriv)
+require(Deriv) # derivadas parciales
+#--- Metodo de Taylor, orden 4
+
+mtaylor4 = function(f, t0, y0, h, n){
+#Datos igualmente espaciados iniciando en t0 = a, paso h. "n" datos 
+t = seq(t0, t0 + (n-1)*h, by = h) # n datos
+y = rep(NA, times=n) # n datos
+y[1] = y0
+  # Derivadas parciales con el paquete Deriv. Deriv(f)
+ft=Deriv(f,"t"); fy=Deriv(f,"y")
+f1 = function(t,y)
+ft(t,y)+fy(t,y)*f(t,y)
+f1t=Deriv(f1,"t");   f1y=Deriv(f1,"y")
+f2= function(t,y) f1t(t,y)+f1y(t,y)*f(t,y)
+f2t=Deriv(f2,"t");    f2y=Deriv(f2,"y")
+f3= function(t,y) f2t(t,y)+f2y(t,y)*f(t,y)
+for(i in 2:n ){
+# orden m = 4
+     f0i = f(t[i-1], y[i-1])
+     f1i = f1(t[i-1], y[i-1])
+     f2i = f2(t[i-1], y[i-1])
+     f3i = f2(t[i-1], y[i-1])
+     y[i] = y[i-1] + h*(f0i + h/2*f1i + h^2/6*f2i + h^3/24*f3i )
+  }
+  print(cbind(t,y))                   #imprimir
+  plot(t,y, pch=19, col="red",cex = 2) #gráfica
+}
+
+f = function(t,u)  cos(2*t)-u*(t-2*pi)*cos(2*(t-2*pi))
+ t0 = 4; y0 = 0; h = 0.1; n=10
+ mtaylor4(f, t0, y0, h, n)
+```
+
+
+
+Punto 5.
+Utilizando la ecuación del problema uno verifique la sensibilidad y la estabilidad del método.
+
+```{r}
+
+
+funcionReal<-function(x){
+  yR <- (2/15)*exp(x/2)*(15*cos((sqrt(15)*x)/2)-2*sqrt(15)*sin((sqrt(15)*x)/2))
+  return(yR)
+}
+
+funcion=function(t,y,parms){
+  dy <- y[2]
+  dz <- -4*y[1]+y[2]
+  return(list(c(dy,dz)))
+}
+tis = seq(0,2,by = 0.1)
+yR = funcionReal(tis)
+plot(tis,yR,pch = 15, col = "red", cex = 1, xlim = c(0, 2), ylim = c(-10, 5), xlab = "x", ylab = "y",main = "x''-x-x'=0 con h = 0,1")
+par(new = TRUE)
+
+sol = ode(c(2,-1),tis,funcion,parms=NULL,method = "rk4")
+tabla = data.frame(sol)
+
+plot(tis,tabla[,2], pch = 15, col = "blue", cex = 0.5,xlim = c(0, 2), ylim = c(-10, 5), xlab = "x", ylab = "y")
+
+legend("topright",
+       c("analytical","rk4, h=0.1"),
+       lty = c(NA, NA), lwd = c(2, 1),
+       pch = c(16, 16),
+       col = c("red", "blue"))
+error <- (yR-tabla[,2])/tabla[,2]
+tablaError = data.frame(tis, round(yR, digits = 5),round(tabla[,2], digits = 5),round(error, digits = 5))
+
+
+vp<-0
+fn<-0
+for(i in 1:10){
+  if(tablaError[i,3]<0.00001){
+    vp=vp+1
+  }else{
+    fn=fn+1
+  }
+}
+
+sencibilidad = vp/(vp+fn)
+print(vp)
+print(fn)
+print(sencibilidad)
+#print ("La sencibilidad del método es de ", sencibilidad, "con VP=",vp, "y fn=",fn)
+
+#lambda<<0
+#Suponinedo que lambda es -100
+
+estabilidad<-function(z){
+  1+z
+}
+
+Z<-function(h,lambda){
+  h+lambda
+}
+h=0.1
+lambda=-100
+estabilidad(Z(h,lambda))
+
+```
+
+
+Punto 6.
+Construya métoodo numérico para solucionar el problema conocido de deflexion de una viga.
+
+```{r}
+defleccion <- function(L,q,E,S,I){ S/(E*I)*w + q*x/(2*E*I)+(x-L)}
+defleccion <- function(L,q,E,S,I,x){ S/(E*I)*w + q*x/(2*E*I)+(x-L)}
+
+```
+
+
+Punto 7.
+Implemente un método numérico que permita solucionar una ecuación diferencial, teniendo como información adicional tres puntos de la solución.
+
+```{r}
+require(mosaicCalc)
+# 5x'' + 33x' + x - 5 = 0 
+# x''(0) = 2
+# x'(0) = 1
+# x(0) = 0
+
+sol <- integrateODE(dx~ 5*x2 + 33*x1 + x - 5, x2=2, x1=1, x = 0, xdur=list(from=0,to=50)  )
+
+print(sol$x(1))
+```
+
+
+Punto 8.
+Resolver el sistema homogeneo utilizando el método de Runge-Kutta, compare con la solución exacta, calcule el tamaño del error: 
+
+```{r}
+rungekutta = function(f,t0,y0,h,n){
+t = seq(t0, t0+n*h, by=h)
+y = rep(NA, times=(n+1))
+# length(t)==length(y)
+y[1] = y0
+for(k in 2:(n+1)){
+  k1=h/2*f(t[k-1],y[k-1])
+  k2=h/2*f(t[k-1]+h/2, y[k-1]+k1)
+  k3=h/2*f(t[k-1]+h/2, y[k-1]+k2)
+  k4=h/2*f(t[k-1]+h, y[k-1]+2*k3)
+  y[k] = y[k-1]+1/3*(k1+2*k2+2*k3+k4)
+}
+dat = cbind(t,y)
+print(as.matrix(dat))
+ plot(t,y,pch=20, col="red")
+}
+#Pruebas----
+options(digits = 4) 
+f=function(x,y) 3*x+7*y
+t0=0; y0=0; h= 0.1; n= 10 
+rungekutta(f,t0,y0,h,n)
+f2f=function(x,y) x+sqrt(3)*y
+rungekutta(f2f,t0,y0,h,n)
+
+exacta1=function(t) {
+  1/sqrt(3+sqrt(3))*(-exp((4-sqrt(3*(3+sqrt(3)))*t))+sqrt(3)*exp((4-sqrt(3*(3+sqrt(3)))*t))+sqrt(3+sqrt(3))*exp((4-sqrt(3*(3+sqrt(3)))*t))+exp((4+sqrt(3*(3+sqrt(3)))*t))-sqrt(3)*exp((4+sqrt(3*(3+sqrt(3)))*t))+sqrt(3+sqrt(3))*exp((4+sqrt(3*(3+sqrt(3)))*t)))
+}
+
+exacta2= function(t){
+  1/sqrt(3*(3+sqrt(3)))*(-6*exp(4-sqrt(3*(3+sqrt(3))))+sqrt(3*(3+sqrt(3)))*exp(4-sqrt(3*(3+sqrt(3))))+6*exp(4+sqrt(3*(3+sqrt(3))))+sqrt(3*(3+sqrt(3)))*exp(4+sqrt(3*(3+sqrt(3)))))
+}
+
+```
+
+Se utilizarón las siguientes paginas como guía:
+https://rdrr.io/cran/mosaicCalc/src/R/integrateODE.R
+http://canek.azc.uam.mx/Ecuaciones/Teoria/6.Laplace/6.6.Aplicaciones/S2x/FD28.pdf
+http://wmatem.eis.uva.es/~jesroj/matem1/Curso/Cap08a_Esquema.pdf
